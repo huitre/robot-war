@@ -48,8 +48,6 @@ app.get('/join', (req, res) => {
   res.render('rooms', {rooms : rooms});
 })
 
-
-
 app.post('/create', (req, res) => {
   let s = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789=@_-',
       room = '';
@@ -69,4 +67,4 @@ app.get('/room/:room', (req, res) => {
 })
 
 serverio.init(IO.listen(app.listen(config.port)));
-
+console.log(`Listening on ${config.port}`);

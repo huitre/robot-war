@@ -14,23 +14,29 @@ class ServerIo {
 		  socket.join(room);
 		  console.log(`user joined room #${room}`);
 
-		  socket.emit('player number', this.addPlayer(socket));
+		  socket.emit('player number', this.addPlayer(socket.id));
 
-		  socket.on('disconnect', () => {
+		  socket.on('disconnect', (e) => {
 		    socket.leave(room);
-		    this.removePlayer(socket)
+		    this.removePlayer(socket.id)
 		    console.log(`user joined room #${room}`);
 		  });
 
-		  socket.on('movement', (msg) => {
+		  socket.on('movement', (msg, player) => {
+		  	console.log(msg, player);
 		  	io.to(room).emit('movement', msg);
 		  })
 		})
 	}
 
-	addPlayer (socket) {
-		this.players.push(socket);
+	addPlayer (id) {
+		this.players.push(id);
 		return this.players.length;
+	}
+
+	removePlayer (id) {
+		var index = this.players.indexOf(id);
+		this.players = this.players.slice(index, index + 1);
 	}
 }
 

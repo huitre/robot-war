@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-11 19:49:24
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-11 20:03:31
+* @Last Modified time: 2015-10-11 22:38:10
 */
 
 'use strict';
@@ -32,6 +32,9 @@
   })
 
   pad.on('move', function (e) {
-    socket.emit('movement', e);
+    socket.emit('movement', {
+      position : e.target.nipples[0], 
+      player : player
+    });
   })
 })(window)
