@@ -34,10 +34,13 @@ app.use((req, res, next) => {
 
 
 let rooms = {
-};
+}, hasRoom = false;
 
 app.get('/', (req, res) => {
-  res.render('index');
+  if (hasRoom)
+    res.redirect('/join');
+  else
+    res.render('index');
 })
 
 app.get('/join/:room', (req, res) => {
@@ -54,8 +57,10 @@ app.post('/create', (req, res) => {
   for (var i = 0; i < 10; i++) {
     room += s[Math.floor(Math.random() * (s.length))];
   }
-  if (!rooms[room])
+  if (!rooms[room]) {
     rooms[room] = true;
+    hasRoom = true;
+  }
   res.redirect(`/room/${room}`);
 })
 
@@ -63,7 +68,7 @@ app.get('/room/:room', (req, res) => {
   if (rooms[req.params.room])
     res.render('main');
   else
-    res.status(500).send(`${req.params.room} est invalide`);
+    res.redirect('/join');
 })
 
 serverio.init(IO.listen(app.listen(config.port)));

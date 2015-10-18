@@ -1,12 +1,13 @@
 include ./header.jade
 body
   section
-    h1 Liste des parties
+    form(action='/create' method='post')
+      h2 Creer une partie
+      input(type='submit' class='button' value='creer')
+    h2 Liste des parties
     ul(class='small-block-grid-2 medium-block-grid-3 large-block-grid-4')
       each b, room in rooms
         li(class='qrcode') #{room}
-  script(src='https://cdn.socket.io/socket.io-1.3.7.js')
-  script(src='/js/nipple.min.js')
   script(src='/js/qrcode.min.js')
   script.
     var qrcodes = document.querySelectorAll('.qrcode');
@@ -15,8 +16,8 @@ body
       var text = qrcodes[i].innerText,
           link = 'http://' + window.location.host + window.location.pathname + '/' + text,
           a = document.createElement('a');
-
-      a.href = link;
+      
+      a.href = link.replace('join//', 'join/');
       a.innerText = 'Rejoindre';
       a.target = '_blank';
       qrcodes[i].innerText = '';

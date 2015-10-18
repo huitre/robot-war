@@ -1,6 +1,9 @@
 include ./header.jade
 body
+  section
     form(action='/create' method='post')
-        span.
-            Creer une partie
-        input(type='submit' value='creer')
+      div(class='row')
+        h1 Bienvenue sur Robot-War
+        div(class='medium-7 large-6 columns')
+          h2 Creer une partie
+          input(type='submit' class='button' value='creer')
