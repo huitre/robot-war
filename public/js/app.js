@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-10 22:59:59
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-18 20:16:53
+* @Last Modified time: 2015-10-19 22:13:03
 */
 
 'use strict';
@@ -21,8 +21,8 @@ room = whoami.substr(whoami.indexOf('/') + 1);
 
 socket = io(window.location.host, {query: 'room='+room});
 
-socket.on('movement', function (msg, player) {
-  Game.updatePlayer(msg, player);
+socket.on('movement', function (msg) {
+  Game.updatePlayer(msg.player.id, msg.mvt);
 })
 
 socket.on('player number', function (msg) {

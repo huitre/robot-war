@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-18 20:51:17
+* @Last Modified time: 2015-10-19 22:30:07
 */
 
 'use strict';
@@ -12,12 +12,12 @@ var game = new Phaser.Game(window.innerWidth, 600, Phaser.AUTO, 'phaser-example'
 var PhaserGame = function () {
     this.players = {};
     this.nbPlayers = 0;
+    this.maxSpeed = 300;
 };
 
 PhaserGame.prototype = {
 
     init: function () {
-        this.maxSpeed = 300;
         game.renderer.renderSession.roundPixels = true;
         this.physics.startSystem(Phaser.Physics.ARCADE);
     },
@@ -40,11 +40,12 @@ PhaserGame.prototype = {
         return this.players[id].sprite;
     },
 
-    updatePlayer: function (msg) {
-        var sprite = this.getPlayerSprite(msg.player);
+    updatePlayer: function (id, stick) {
+        var sprite = this.getPlayerSprite(id);
 
-        game.physics.arcade.velocityFromRotation(msg.mvt.rotation, this.stick.force * this.maxSpeed, sprite.body.velocity);
-        game.sprite.rotation = this.stick.rotation;
+        var a = game.physics.arcade.velocityFromRotation(stick.angle.radian, stick.force * this.maxSpeed, sprite.body.velocity);
+        console.log(a, sprite);
+        sprite.rotation = -stick.angle.radian;
     },
 
     addPlayer: function (player) {
