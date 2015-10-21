@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-11 19:49:24
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-19 21:23:53
+* @Last Modified time: 2015-10-21 21:41:47
 */
 
 'use strict';
@@ -35,7 +35,7 @@
   });
 
 
-  pad.on('move', function (e, data) {
+  pad.on('start move', function (e, data) {
     socket.emit('movement', {
       position : data, 
       player : player

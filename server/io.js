@@ -18,9 +18,6 @@ class ServerIo {
 			},
 
 			removePlayer: function (id) {
-				/*var index = this.players.indexOf(id);
-				this.players = this.players.slice(index, index + 1);
-				*/
 				delete this.players[id];
 			},
 
@@ -47,7 +44,7 @@ class ServerIo {
 		  socket.join(room);
 		  console.log(`user joined room #${room}`);
 
-		  socket.to(room).emit('player number', playerManager.addPlayer(socket.id));
+		  socket.to(room).emit('player connect', playerManager.addPlayer(socket.id));
 
 		  socket.on('disconnect', (e) => {
 		    socket.leave(room);
@@ -60,6 +57,10 @@ class ServerIo {
 		  		mvt: msg.position, 
 		  		player : playerManager.getPlayer(socket.id)
 		  	});
+		  })
+
+		  socket.on('player all', () => {
+		  	io.to(room).emit('player status', this.players);
 		  })
 		})
 
