@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-10 22:59:59
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-21 22:05:13
+* @Last Modified time: 2015-10-23 20:34:16
 */
 
 'use strict';
@@ -30,7 +30,7 @@ socket.on('player connect', function (msg) {
     Game.addPlayer(msg);
 })
 
-socket.emit('players all');
+socket.emit('player all');
 
 socket.on('player status', function (players) {
   for (var player in players)
