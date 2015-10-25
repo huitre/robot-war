@@ -2,11 +2,40 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-25 11:26:51
+* @Last Modified time: 2015-10-25 21:48:39
 */
 
 'use strict';
 
+var Ball = function (game) {
+    this.game = game;
+    this.maxSpeed = 200;
+    this.speed = 200;
+    this.friction = 3;
+    this.sprite = this.getTexture();
+}
+
+Ball.prototype.getTexture = function (color) {
+    var ballData = [
+                '.111.',
+                '11311',
+                '13331',
+                '11311',
+                '.111.',
+            ], 
+            sprite;
+    this.game.create.texture('ball', ballData, 4, 4, 0);
+    sprite = this.game.add.sprite(window.innerWidth/ 2, window.innerHeight/ 2, 'ball');
+    this.game.physics.arcade.enable(sprite);
+    sprite.anchor.set(0.5);
+    sprite.body.collideWorldBounds = true;
+    sprite.body.bounce.setTo(0.3, 0.3);
+    return sprite;
+}
+
+Ball.prototype.isHit = function () {
+    console.log(arguments);
+}
 
 var Player = function (index, game, team) {
     this.isMoving = false;
@@ -20,7 +49,7 @@ var Player = function (index, game, team) {
 }
 
 Player.prototype.getTexture = function (color) {
-     var playerData = [
+    var playerData = [
                 '.11111111',
                 '112222210',
                 '12222210.',
@@ -37,7 +66,7 @@ Player.prototype.getTexture = function (color) {
         playerData[4] = playerData[4].replace(/6/g, color == 2 ?  0 : color);
         this.game.create.texture('phaserDude' + color, playerData, 4, 4, 0);
         
-        sprite = this.game.add.sprite(Math.random() * 300, Math.random() * 300, 'phaserDude' + color);
+        sprite = this.game.add.sprite(window.innerWidth/ 2 - Math.random() * 50, window.innerHeight/ 2 - Math.random() * 50, 'phaserDude' + color);
         this.game.physics.arcade.enable(sprite);
         sprite.anchor.set(0.5);
         sprite.body.collideWorldBounds = true;
@@ -57,13 +86,14 @@ Player.prototype.update = function (stick) {
         try {
             this.game.physics.arcade.velocityFromRotation(this.sprite.rotation, this.speed, this.sprite.body.velocity);
         } catch (e) {
-
+            this.speed = this.speed ? this.speed - this.friction : 0;
         }
     }
 }
 
 var PhaserGame = function () {
-    this.game = new Phaser.Game(window.innerWidth, 600, Phaser.AUTO, 'phaser-example', {
+    var ratio = 1; // calcul de ratio futur pour device != 16/10
+    this.game = new Phaser.Game(window.innerWidth * ratio, window.innerHeight * ratio, Phaser.AUTO, 'phaser-example', {
         create : this.create.bind(this),
         update : this.update.bind(this),
         render : this.render.bind(this)
@@ -87,12 +117,15 @@ PhaserGame.prototype = {
 
     create: function () {
         console.log('create');
+        this.ball = new Ball(this.game);
     },
 
 
     update: function () {
-        for (var o in this.players)
-            this.players[o].update();        
+        for (var o in this.players) {
+            this.game.physics.arcade.collide(this.players[o].sprite, this.ball.sprite);  
+            this.players[o].update();
+        }
     },
 
     render : function () {

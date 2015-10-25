@@ -1,9 +1,6 @@
 include ./header.jade
-body
-  section
-    input#content
-    span#room
-    script(src='https://cdn.socket.io/socket.io-1.3.7.js')
-    script(src='/js/phaser.min.js')
-    script(src='/js/game.js')
-    script(src='/js/app.js')
+body(id='main')
+  script(src='https://cdn.socket.io/socket.io-1.3.7.js')
+  script(src='/js/phaser.min.js')
+  script(src='/js/game.js')
+  script(src='/js/app.js')
