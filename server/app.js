@@ -58,7 +58,9 @@ app.post('/create', (req, res) => {
     room += s[Math.floor(Math.random() * (s.length))];
   }
   if (!rooms[room]) {
-    rooms[room] = true;
+    rooms[room] = {
+        players : 4
+      };
     hasRoom = true;
   }
   res.redirect(`/room/${room}`);

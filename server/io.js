@@ -2,6 +2,7 @@
 
 import io from 'socket.io';
 
+
 class ServerIo {
 	init (io) {
 		var playerManager = {

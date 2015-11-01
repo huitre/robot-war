@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-10-30 17:05:09
+* @Last Modified time: 2015-11-01 22:19:20
 */
 
 'use strict';
@@ -36,11 +36,22 @@ Ball.prototype.getTexture = function (color) {
     return sprite;
 }
 
-Ball.prototype.isHit = function () {
-    console.log(arguments);
+Ball.prototype.isHit = function (player, ball) {
+    this.speed = 300;
 }
 
-var Player = function (index, game, team) {
+Ball.prototype.update = function () {
+    this.speed = this.speed ? this.speed - this.friction : 0;
+    if (this.speed > 0) {
+        try {
+            this.game.physics.arcade.velocityFromRotation(this.sprite.rotation, this.speed, this.sprite.body.velocity);
+        } catch (e) {
+            this.speed = this.speed ? this.speed - this.friction : 0;
+        }
+    }
+}
+
+var Player = function (index, game, team, teamIndex) {
     var getIndex = function (index) {
         var t = {
             'A' : 10,
@@ -56,13 +67,14 @@ var Player = function (index, game, team) {
         return index;
     }
     this.isMoving = false;
-    this.index = 3 + index;
+    this.index = index;
+    this.teamIndex = teamIndex;
     this.game = game;
     this.maxSpeed = 200;
     this.speed = 200;
     this.friction = 3;
     this.team = team;
-    this.sprite = this.getTexture(index);
+    this.sprite = this.getTexture(getIndex(index));
 }
 
 Player.prototype.getTexture = function (color) {
@@ -89,7 +101,7 @@ Player.prototype.getTexture = function (color) {
     }
     this.game.create.texture('robot' + color, playerTexture, 4, 4, 0);
     
-    sprite = this.game.add.sprite(W/ 2 - Math.random() * 50, H/ 2 - Math.random() * 50, 'robot' + color);
+    sprite = this.game.add.sprite(W/ 2 - 50, H/ 2 - Math.random() * 50, 'robot' + color);
     this.game.physics.arcade.enable(sprite);
     sprite.anchor.set(0.5);
     sprite.body.collideWorldBounds = true;
@@ -147,6 +159,50 @@ var Ground = function (game) {
 
 }
 
+var Goal = function (game) {
+    this.goal1 = this.goal2 = null;
+    this.create(game);
+}
+
+Goal.prototype.create = function (game) {
+    var goal1Texture = [
+            'FF',
+            'F',
+            'F',
+            'F',
+            'F',
+            'F',
+            'F',
+            'FF',
+        ], goal2Texture = [
+            'FF',
+            '.F',
+            '.F',
+            '.F',
+            '.F',
+            '.F',
+            '.F',
+            'FF',
+        ],goal, goal2;
+    
+    game.create.texture('goal', goal1Texture, 4, 4, 0);
+    game.create.texture('goal2', goal2Texture, 4, 4, 0);
+    
+    goal = game.add.sprite(0, (H - 50) / 2, 'goal');
+    goal2 = game.add.sprite((W - 10), (H - 50) / 2, 'goal2');
+
+    goal2.height = goal.height = W/H * 70;
+    goal.width = goal2.width = 10;
+
+    game.physics.arcade.enable(goal);
+    game.physics.arcade.enable(goal2);
+    goal.body.immovable = true;
+    goal2.body.immovable = true;
+
+    this.goal1 = goal;
+    this.goal2 = goal2;
+}
+
 
 var PhaserGame = function () {
     var ratio = 1; // calcul de ratio futur pour device != 16/10
@@ -159,6 +215,8 @@ var PhaserGame = function () {
     this.nbPlayers = 0;
     this.maxSpeed = 300;
     this.team = [[], []];
+    this.maxPlayers = 4;
+    this.ground = this.ball = this.goal = null;
 };
 
 PhaserGame.prototype = {
@@ -176,15 +234,23 @@ PhaserGame.prototype = {
     create: function () {
         console.log('create');
         this.ground = new Ground(this.game);
+        this.goal = new Goal(this.game);
         this.ball = new Ball(this.game);
     },
 
 
     update: function () {
         for (var o in this.players) {
-            this.game.physics.arcade.collide(this.players[o].sprite, this.ball.sprite);  
+            this.game.physics.arcade.collide(this.players[o].sprite, this.ball.sprite, this.ball.isHit);
+            this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal1, function (ball, goal) {
+                debugger;
+            });
+            this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal2, function (ball, goal) {
+                debugger;
+            });
             this.players[o].update();
         }
+        this.ball.update();
     },
 
     render : function () {
@@ -202,10 +268,12 @@ PhaserGame.prototype = {
     addPlayer: function (playerMsg) {
         var teamName = this.getTeamForPlayer(),
             player = null;
-        player = new Player(playerMsg.nb, this.game, teamName);
+        player = new Player(playerMsg.nb, this.game, teamName, this.team[teamName].length + 1);
         this.players[playerMsg.id] = player;
         this.team[teamName].push(player);
         this.nbPlayers++;
+        player.x = 10;
+        player.y = 20;
     },
 
     getTeamForPlayer: function () {
