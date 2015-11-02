@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-11-01 22:19:20
+* @Last Modified time: 2015-11-02 22:02:59
 */
 
 'use strict';
@@ -16,6 +16,7 @@ var Ball = function (game) {
     this.speed = 200;
     this.friction = 3;
     this.sprite = this.getTexture();
+    this.last = null;
 }
 
 Ball.prototype.getTexture = function (color) {
@@ -36,8 +37,9 @@ Ball.prototype.getTexture = function (color) {
     return sprite;
 }
 
-Ball.prototype.isHit = function (player, ball) {
+Ball.prototype.isHit = function (playerID) {
     this.speed = 300;
+    this.last = playerID;
 }
 
 Ball.prototype.update = function () {
@@ -217,6 +219,7 @@ var PhaserGame = function () {
     this.team = [[], []];
     this.maxPlayers = 4;
     this.ground = this.ball = this.goal = null;
+    this.score = [0, 0];
 };
 
 PhaserGame.prototype = {
@@ -241,12 +244,16 @@ PhaserGame.prototype = {
 
     update: function () {
         for (var o in this.players) {
-            this.game.physics.arcade.collide(this.players[o].sprite, this.ball.sprite, this.ball.isHit);
+            var ball = this.ball,
+                self = this;
+            this.game.physics.arcade.collide(this.players[o].sprite, this.ball.sprite, function () {
+                ball.isHit(o);
+            });
             this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal1, function (ball, goal) {
-                debugger;
+                self.playerScored(ball.last, 0);
             });
             this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal2, function (ball, goal) {
-                debugger;
+                self.playerScored(ball.last, 1);
             });
             this.players[o].update();
         }
