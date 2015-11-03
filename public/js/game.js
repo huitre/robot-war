@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-11-02 22:02:59
+* @Last Modified time: 2015-11-03 22:34:47
 */
 
 'use strict';
@@ -13,7 +13,7 @@ var W = window.innerWidth,
 var Ball = function (game) {
     this.game = game;
     this.maxSpeed = 200;
-    this.speed = 200;
+    this.speed = 0;
     this.friction = 3;
     this.sprite = this.getTexture();
     this.last = null;
@@ -40,6 +40,7 @@ Ball.prototype.getTexture = function (color) {
 Ball.prototype.isHit = function (playerID) {
     this.speed = 300;
     this.last = playerID;
+    console.log(this.last);
 }
 
 Ball.prototype.update = function () {
@@ -128,6 +129,10 @@ Player.prototype.update = function (stick) {
     }
 }
 
+Player.prototype.victory = function () {
+
+}
+
 var Ground = function (game) {
     var wallTexture = [
             '55555'
@@ -190,10 +195,10 @@ Goal.prototype.create = function (game) {
     game.create.texture('goal', goal1Texture, 4, 4, 0);
     game.create.texture('goal2', goal2Texture, 4, 4, 0);
     
-    goal = game.add.sprite(0, (H - 50) / 2, 'goal');
-    goal2 = game.add.sprite((W - 10), (H - 50) / 2, 'goal2');
+    goal = game.add.sprite(0, (H - 30/100 * H) / 2, 'goal');
+    goal2 = game.add.sprite((W - 10), (H - 30/100 * H) / 2, 'goal2');
 
-    goal2.height = goal.height = W/H * 70;
+    goal2.height = goal.height = 30/100 * H;
     goal.width = goal2.width = 10;
 
     game.physics.arcade.enable(goal);
@@ -220,6 +225,7 @@ var PhaserGame = function () {
     this.maxPlayers = 4;
     this.ground = this.ball = this.goal = null;
     this.score = [0, 0];
+    this.hasScored = false;
 };
 
 PhaserGame.prototype = {
@@ -230,8 +236,6 @@ PhaserGame.prototype = {
     },
 
     preload: function () {
-
-
     },
 
     create: function () {
@@ -243,25 +247,41 @@ PhaserGame.prototype = {
 
 
     update: function () {
+        var ball = this.ball,
+            self = this;
+
         for (var o in this.players) {
-            var ball = this.ball,
-                self = this;
             this.game.physics.arcade.collide(this.players[o].sprite, this.ball.sprite, function () {
                 ball.isHit(o);
             });
-            this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal1, function (ball, goal) {
-                self.playerScored(ball.last, 0);
-            });
-            this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal2, function (ball, goal) {
+            this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal1, function () {
                 self.playerScored(ball.last, 1);
+            });
+            this.game.physics.arcade.collide(this.ball.sprite, this.goal.goal2, function () {
+                self.playerScored(ball.last, 0);
             });
             this.players[o].update();
         }
         this.ball.update();
     },
 
-    render : function () {
+    render: function () {
+    },
 
+    playerScored: function (id, team) {
+        if (this.hasScored)
+            return;
+        this.hasScored = true;
+        this.score[team] += 1;
+        this.getPlayer(id).victory();
+        this.setStartPosition();
+    },
+
+    setStartPosition: function () {
+        for (var o in this.team) {
+
+        }
+        this.hasScored = false;
     },
 
     getPlayer: function (id) {
