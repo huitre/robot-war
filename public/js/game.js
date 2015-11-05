@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-11-04 22:01:23
+* @Last Modified time: 2015-11-05 22:02:32
 */
 
 'use strict';
@@ -33,7 +33,7 @@ Ball.prototype.getTexture = function (color) {
     this.game.physics.p2.enable(sprite, false);
     sprite.anchor.set(0.5);
     sprite.body.collideWorldBounds = true;
-    sprite.body.setCircle(28);
+    sprite.body.setCircle(8);
     return sprite;
 }
 
@@ -105,28 +105,31 @@ Player.prototype.getTexture = function (color) {
     this.game.create.texture('robot' + color, playerTexture, 4, 4, 0);
     
     sprite = this.game.add.sprite(W/ 2 - 50, H/ 2 - Math.random() * 50, 'robot' + color);
-    this.game.physics.p2.enable(sprite, false);
     sprite.anchor.set(0.5);
+    this.game.physics.p2.enable(sprite, false);
+    sprite.body.setRectangle(40, 30);
+    sprite.body.setZeroRotation();
     sprite.body.collideWorldBounds = true;
-    sprite.body.immovable = false;
+    sprite.body.immovable = true;
+    sprite.body.debug = true;
+    sprite.body.fixedRotation = true;
 
     return sprite;
 }
 
 Player.prototype.update = function (stick) {
     if (stick !== undefined && stick != null && stick) {
-        this.sprite.rotation = -stick.angle.radian;
-        this.speed = this.maxSpeed;
-        if (stick.force)
-            this.sprite.body.velocity.x = stick.force * 100;
-    } else 
-        this.speed = this.speed ? this.speed - this.friction : 0;
-    if (this.speed > 0) {
         try {
-            //this.game.physics.p2.velocityFromRotation(this.sprite.rotation, this.speed, this.sprite.body.velocity);
-        } catch (e) {
-            this.speed = this.speed ? this.speed - this.friction : 0;
-        }
+            //this.sprite.body.rotateLeft(stick.angle.degree);
+             this.sprite.body.rotation = stick.angle.radian;
+             this.sprite.rotation = stick.angle.radian;
+            //console.log(stick.angle.degree)
+        } catch (e) {}
+        this.speed = 60;
+        this.sprite.body.thrust(this.speed);
+    } else {
+        //this.sprite.body.setZeroRotation();
+        this.sprite.body.reverse(3);
     }
 }
 
