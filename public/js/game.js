@@ -2,7 +2,7 @@
 * @Author: huitre
 * @Date:   2015-10-17 20:01:47
 * @Last Modified by:   huitre
-* @Last Modified time: 2015-11-03 22:34:47
+* @Last Modified time: 2015-11-05 22:10:31
 */
 
 'use strict';
@@ -34,24 +34,18 @@ Ball.prototype.getTexture = function (color) {
     sprite.anchor.set(0.5);
     sprite.body.collideWorldBounds = true;
     sprite.body.bounce.setTo(0.3, 0.3);
+    sprite.body.debug = true;
     return sprite;
 }
 
 Ball.prototype.isHit = function (playerID) {
-    this.speed = 300;
+    //this.speed = 300;
     this.last = playerID;
-    console.log(this.last);
 }
 
 Ball.prototype.update = function () {
-    this.speed = this.speed ? this.speed - this.friction : 0;
-    if (this.speed > 0) {
-        try {
-            this.game.physics.arcade.velocityFromRotation(this.sprite.rotation, this.speed, this.sprite.body.velocity);
-        } catch (e) {
-            this.speed = this.speed ? this.speed - this.friction : 0;
-        }
-    }
+    this.sprite.body.velocity.x *= 0.98;
+    this.sprite.body.velocity.y *= 0.98;
 }
 
 var Player = function (index, game, team, teamIndex) {
@@ -110,6 +104,7 @@ Player.prototype.getTexture = function (color) {
     sprite.body.collideWorldBounds = true;
     sprite.body.bounce.setTo(0.3, 0.3);
     sprite.body.immovable = false;
+    sprite.body.debug = true;
 
     return sprite;
 }
